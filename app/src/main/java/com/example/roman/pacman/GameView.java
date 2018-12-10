@@ -1,13 +1,17 @@
 package com.example.roman.pacman;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 public class GameView extends View {
 
@@ -28,6 +32,44 @@ public class GameView extends View {
 
     //životy
     private Bitmap life[] = new Bitmap[3];
+
+    float pacx = 200;
+    float pacy = 300;
+
+    float speedx = 0;
+    float speedy = 0;
+
+    int width;
+    int height;
+
+    //20*30
+    private int level[] = {
+            1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+    };
 
     public GameView(Context context) {
         super(context);
@@ -50,16 +92,44 @@ public class GameView extends View {
         life[1] = BitmapFactory.decodeResource(getResources(), R.drawable.pacman);
         life[2] = BitmapFactory.decodeResource(getResources(), R.drawable.pacman);
 
-        wall = BitmapFactory.decodeResource(getResources(), R.drawable.Block);
-        point = BitmapFactory.decodeResource(getResources(), R.drawable.Point);
+        wall = BitmapFactory.decodeResource(getResources(), R.drawable.block);
+        point = BitmapFactory.decodeResource(getResources(), R.drawable.point);
 
 
     }
 
     @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        width = w / 25;
+        height = (h-100) / 25;
+        super.onSizeChanged(w, h, oldw, oldh);
+    }
+
+    @Override
     protected void onDraw(Canvas canvas) {
 
-        canvas.drawBitmap(pacman, 400,500,null);
+        boolean first = true;
+
+        for (int i = 0; i < 25; i++) {
+            for (int j = 0; j < 25; j++) {
+                if(level[i*25 + j]==1)
+                {
+                    canvas.drawBitmap(wall, null,
+                            new Rect(j*width, i*height,(j+1)*width, (i+1)*height), null);
+                }
+                if(level[i*25 + j]==0)
+                {
+                    canvas.drawBitmap(point, null,
+                            new Rect(j*width, i*height,(j+1)*width, (i+1)*height), null);
+                }
+
+            }
+        }
+
+
+        pacx += speedx;
+        pacy += speedy;
+        canvas.drawBitmap(pacman, pacx,pacy,null);
 
         canvas.drawText("Skóre: 0",20,60, score);
 
@@ -69,6 +139,53 @@ public class GameView extends View {
         canvas.drawBitmap(life[1],10,canvas.getHeight()-180, null);
         canvas.drawBitmap(life[2],10,canvas.getHeight()-280, null);
 
-        
+
+    }
+    public boolean onTouchEvent(MotionEvent event) {
+
+        switch(event.getAction()) {
+
+            case MotionEvent.ACTION_DOWN: {
+
+                double xDown = event.getX();
+                double yDown = event.getY();
+                Toast.makeText(getContext(), "xDown " + xDown, Toast.LENGTH_SHORT).show();
+
+
+                if (xDown >= Resources.getSystem().getDisplayMetrics().widthPixels / 4 * 3) { //doprava
+
+                    speedx = 15;
+                    speedy = 0;
+
+                    invalidate();
+
+                } else if (xDown <= Resources.getSystem().getDisplayMetrics().widthPixels / 4) { //doleva
+
+                    speedx = -15;
+                    speedy = 0;
+
+                    invalidate();
+
+                } else if (yDown >= Resources.getSystem().getDisplayMetrics().heightPixels / 4 * 3) { //nahoru
+
+                    speedy = 15;
+                    speedx = 0;
+
+                    invalidate();
+
+                } else if (yDown <= Resources.getSystem().getDisplayMetrics().heightPixels / 4) { //dolů
+
+                    speedy = -15;
+                    speedx = 0;
+
+                    invalidate();
+
+                }
+            }
+        }
+
+
+
+        return super.onTouchEvent(event);
     }
 }
