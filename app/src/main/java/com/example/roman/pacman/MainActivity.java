@@ -11,12 +11,14 @@ public class MainActivity extends AppCompatActivity {
 
     private GameView gameView;
     private Handler handler = new Handler();
-    private final static long TIMER_INTERVAL = 30;
+    private final static long TIMER_INTERVAL = 50;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_settings);
+
+
 
         gameView = new GameView(this);
         setContentView(gameView);
