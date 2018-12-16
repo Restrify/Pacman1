@@ -1,16 +1,20 @@
 package com.example.roman.pacman;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 
-public class Highscore extends Activity {
+public class Highscore extends Activity implements View.OnClickListener {
 
     SQLite mydb;
     private ListView obj;
+    Button button;
     public static ArrayList<Long> arrayListId;
 
     @Override
@@ -22,14 +26,19 @@ public class Highscore extends Activity {
         //naplnim pole polozek
         mydb.setAllContacs();
         //ziskam do jedno listu vsechny polozky
-        ArrayList arrayList = mydb.getAllContacsName();
+        ArrayList arrayList = mydb.getAllScoresName();
 
         ArrayAdapter arrayAdapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1, arrayList);
 
         obj = (ListView)findViewById(R.id.listView1);
+        button = (Button) findViewById(R.id.button2);
+        button.setOnClickListener(this);
         obj.setAdapter(arrayAdapter);
+    }
 
-
-
+    @Override
+    public void onClick(View v) {
+        Intent intent = new Intent(Highscore.this, MainActivity.class);
+        startActivity(intent);
     }
 }

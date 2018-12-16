@@ -19,6 +19,17 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+class Point
+{
+    int x;
+    int y;
+    int point;
+}
+
 class Ghost
 {
     int x;
@@ -29,6 +40,8 @@ public class GameView extends View {
 
     //pacman
     private Bitmap pacman;
+
+    private Bitmap ghost;
 
     //stěna
     private Bitmap wall;
@@ -49,7 +62,7 @@ public class GameView extends View {
     private Sensor gyroscopeSensor;
     private SensorEventListener gyroscopeEventListener;
 
-    private int ghosts[] = new int[6];
+    private Ghost ghosts[] = new Ghost[6];
 
     int pacx;
     int pacy;
@@ -63,6 +76,9 @@ public class GameView extends View {
     int width;
     int height;
 
+    int start = 0;
+    int moves = 7;
+
     Boolean exist = false;
     Boolean end = false;
 
@@ -72,25 +88,25 @@ public class GameView extends View {
             1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
             1,0,1,1,1,1,1,0,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,0,1,
             1,4,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-            1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-            1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-            1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-            1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-            1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-            1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-            1,0,1,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,1,
-            1,0,1,0,0,0,0,0,0,0,1,2,2,2,1,0,0,0,0,0,0,0,0,0,1,
-            1,0,1,0,0,0,0,0,0,0,1,2,2,2,1,0,0,0,0,0,0,0,0,0,1,
-            1,0,1,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,
-            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-            1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-            1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-            1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-            1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-            1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-            1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-            1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,1,0,1,0,0,1,1,1,1,0,1,0,0,0,1,1,1,0,0,0,0,0,1,
+            1,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,
+            1,0,1,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,
+            1,0,1,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,
+            1,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,
+            1,0,1,0,0,1,0,0,0,0,0,1,2,1,0,0,0,0,0,0,1,0,0,0,1,
+            1,0,1,0,0,1,0,0,0,0,0,1,2,1,0,0,0,0,0,0,1,0,0,0,1,
+            1,0,1,0,0,1,0,0,0,0,0,1,2,1,0,0,0,0,0,0,1,0,0,0,1,
+            1,0,1,0,0,1,0,0,0,0,0,1,2,1,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,0,0,0,1,0,0,0,0,0,1,2,1,0,0,0,0,1,0,0,0,0,0,1,
+            1,0,1,0,0,0,0,0,0,0,0,1,2,1,0,0,0,0,1,0,0,0,0,0,1,
+            1,0,1,0,0,0,0,1,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,
+            1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,
+            1,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,
+            1,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,1,1,1,0,0,0,0,0,1,
+            1,0,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,
             1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
             1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
     };
@@ -100,7 +116,7 @@ public class GameView extends View {
 
         this.setBackgroundColor(Color.BLUE);
 
-        pacman = BitmapFactory.decodeResource(getResources(), R.drawable.pacman);
+        pacman = BitmapFactory.decodeResource(getResources(), R.drawable.pacright);
         score.setColor(Color.GREEN);
         score.setTextSize(45);
         score.setTypeface(Typeface.DEFAULT_BOLD);
@@ -116,6 +132,7 @@ public class GameView extends View {
         life[1] = BitmapFactory.decodeResource(getResources(), R.drawable.pacman);
         life[2] = BitmapFactory.decodeResource(getResources(), R.drawable.pacman);
 
+        ghost = BitmapFactory.decodeResource(getResources(), R.drawable.ghost);
         wall = BitmapFactory.decodeResource(getResources(), R.drawable.block);
         point = BitmapFactory.decodeResource(getResources(), R.drawable.point);
 
@@ -154,12 +171,22 @@ public class GameView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
 
+        int count = 0;
             for (int i = 0; i < 25; i++) {
                 for (int j = 0; j < 25; j++) {
                     if (level[i * 25 + j] == 4) {
                         pacx = i;
                         pacy = j;
                         canvas.drawBitmap(pacman, null,
+                                new Rect(j * width, i * height, (j + 1) * width, (i + 1) * height), null);
+                    }
+                    if (level[i * 25 + j] == 2) {
+                        Ghost g = new Ghost();
+                        g.x = i;
+                        g.y = j;
+                        ghosts[count] = g;
+                        count++;
+                        canvas.drawBitmap(ghost, null,
                                 new Rect(j * width, i * height, (j + 1) * width, (i + 1) * height), null);
                     }
                     if (level[i * 25 + j] == 1) {
@@ -173,6 +200,7 @@ public class GameView extends View {
                     }
 
 
+
                 }
             }
             MediaPlayer mp = MediaPlayer.create(getContext(), R.raw.pacman_chomp);
@@ -182,7 +210,10 @@ public class GameView extends View {
                 points += 10;
                 level[pacx * 25 + pacy] = 3;
                 level[(pacx + speedx) * 25 + (pacy + speedy)] = 4;
-                //mp.start();
+                mp.start();
+            }
+            if (level[(pacx + speedx) * 25 + (pacy + speedy)] == 2) {
+                end = true;
             }
             if (level[(pacx + speedx) * 25 + (pacy + speedy)] == 1) {
                 speedx = 0;
@@ -193,10 +224,11 @@ public class GameView extends View {
                 level[(pacx + speedx) * 25 + (pacy + speedy)] = 4;
             }
 
+            moveGhosts();
+
 
             pacx += speedx;
             pacy += speedy;
-            canvas.drawBitmap(pacman, pacx, pacy, null);
 
             canvas.drawText("Skóre: " + points, 20, 60, score);
 
@@ -226,6 +258,7 @@ public class GameView extends View {
                 if (xDown >= Resources.getSystem().getDisplayMetrics().widthPixels / 4 * 3) { //doprava
 
                     if(level[pacx*25 + (pacy + 1)] != 1) {
+                        pacman = BitmapFactory.decodeResource(getResources(), R.drawable.pacright);
                         speedx = 0;
                         speedy = 1;
                     }
@@ -234,22 +267,25 @@ public class GameView extends View {
                 } else if (xDown <= Resources.getSystem().getDisplayMetrics().widthPixels / 4) { //doleva
 
                     if(level[pacx*25 + (pacy - 1)] != 1) {
+                        pacman = BitmapFactory.decodeResource(getResources(), R.drawable.pacleft);
                         speedx = 0;
                         speedy = -1;
                     }
 
 
-                } else if (yDown >= Resources.getSystem().getDisplayMetrics().heightPixels / 4 * 3) { //nahoru
+                } else if (yDown >= Resources.getSystem().getDisplayMetrics().heightPixels / 4 * 3) { //dolů
 
                     if(level[(pacx + 1)*25 + pacy] != 1) {
+                        pacman = BitmapFactory.decodeResource(getResources(), R.drawable.pacdown);
                         speedx = 1;
                         speedy = 0;
                     }
 
 
-                } else if (yDown <= Resources.getSystem().getDisplayMetrics().heightPixels / 4) { //dolů
+                } else if (yDown <= Resources.getSystem().getDisplayMetrics().heightPixels / 4) { //nahoru
 
                     if(level[(pacx - 1)*25 + pacy] != 1) {
+                        pacman = BitmapFactory.decodeResource(getResources(), R.drawable.pacup);
                         speedx = -1;
                         speedy = 0;
                     }
@@ -259,8 +295,64 @@ public class GameView extends View {
             }
         }
 
-
-
         return super.onTouchEvent(event);
+    }
+
+    public void moveGhosts()
+    {
+        List<Point> points = new ArrayList<Point>();
+        for(int i=0;i<ghosts.length;i++)
+        {
+            if(level[(ghosts[i].x+1)*25 + ghosts[i].y] != 1 && level[(ghosts[i].x+1)*25 + ghosts[i].y] != 2)
+            {
+                Point point = new Point();
+                point.x = ghosts[i].x+1;
+                point.y = ghosts[i].y;
+                point.point = level[(ghosts[i].x+1)*25 + ghosts[i].y];
+
+                points.add(point);
+
+            }
+            if(level[(ghosts[i].x-1)*25 + ghosts[i].y] != 1 && level[(ghosts[i].x-1)*25 + ghosts[i].y] != 2)
+            {
+                Point point = new Point();
+                point.x = ghosts[i].x-1;
+                point.y = ghosts[i].y;
+                point.point = level[(ghosts[i].x-1)*25 + ghosts[i].y];
+
+                points.add(point);
+
+            }
+            if(level[ghosts[i].x*25 + ghosts[i].y+1] != 1 && level[ghosts[i].x*25 + ghosts[i].y+1] != 2)
+            {
+                Point point = new Point();
+                point.x = ghosts[i].x;
+                point.y = ghosts[i].y+1;
+                point.point = level[ghosts[i].x*25 + ghosts[i].y+1];
+
+                points.add(point);
+
+            }
+            if(level[ghosts[i].x*25 + ghosts[i].y-1] != 1 && level[ghosts[i].x*25 + ghosts[i].y-1] != 2)
+            {
+                Point point = new Point();
+                point.x = ghosts[i].x;
+                point.y = ghosts[i].y-1;
+                point.point = level[ghosts[i].x*25 + ghosts[i].y-1];
+
+                points.add(point);
+
+            }
+            if(points.size()!=0)
+            {
+                Random rnd = new Random();
+                int rand = rnd.nextInt(points.size());
+
+
+                level[points.get(rand).x*25 + points.get(rand).y] = 2;
+                level[ghosts[i].x*25 + ghosts[i].y] = points.get(rand).point;
+            }
+        }
+
     }
 }

@@ -16,8 +16,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private GameView gameView;
     private Handler handler = new Handler();
-    private final static long TIMER_INTERVAL = 30;
+    private final static long TIMER_INTERVAL = 100;
 
+    SQLite myDB;
     TextView name;
     Spinner type;
     Button start;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_settings);
 
 
+        myDB = new SQLite(this);
         name = (TextView) findViewById(R.id.editTextName);
         type = (Spinner) findViewById(R.id.spinnerType);
         start = (Button) findViewById(R.id.button);
@@ -45,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if(gameView.end)
+                if(!gameView.end)
                 {
                     gameView.invalidate();
                 }
@@ -54,9 +56,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     cancel();
                     Intent intent = new Intent(MainActivity.this, Highscore.class);
                     startActivity(intent);
-
+                    myDB.insertScore((String)name.getText(), Integer.toString(gameView.points));
                 }
-
             };
         }, 0, TIMER_INTERVAL);
     }
