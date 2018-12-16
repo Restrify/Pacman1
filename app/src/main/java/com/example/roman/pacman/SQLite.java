@@ -64,6 +64,7 @@ public class SQLite extends SQLiteOpenHelper{
 
             while(res.isAfterLast() == false){
                 arrayList.add(res.getString(res.getColumnIndex(CONTACTS_COLUMN_NAME)));
+                arrayList.add(res.getString(res.getColumnIndex(CONTACTS_COLUMN_SCORE)));
                 res.moveToNext();
                 arrayList.get(0);
             }
