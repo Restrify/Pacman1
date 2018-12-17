@@ -28,12 +28,12 @@ public class Highscore extends Activity implements View.OnClickListener {
         //ziskam do jedno listu vsechny polozky
         ArrayList arrayList = mydb.getAllScoresName();
 
-        ArrayAdapter arrayAdapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1, arrayList);
+        ListAdapter listAdapter = new ListAdapter(this, R.layout.listviewitems, arrayList);
 
         obj = (ListView)findViewById(R.id.listView1);
         button = (Button) findViewById(R.id.button2);
         button.setOnClickListener(this);
-        obj.setAdapter(arrayAdapter);
+        obj.setAdapter(listAdapter);
     }
 
     @Override

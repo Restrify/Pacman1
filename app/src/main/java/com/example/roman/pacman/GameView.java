@@ -15,6 +15,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -28,6 +29,17 @@ class Point
     int x;
     int y;
     int point;
+}
+
+class Object
+{
+    Bitmap bitmap;
+    Canvas canvas;
+    int j;
+    int i;
+    int width;
+    int height;
+
 }
 
 class Ghost
@@ -80,7 +92,7 @@ public class GameView extends View {
     int moves = 7;
 
     Boolean exist = false;
-    Boolean end = false;
+    Boolean end = true;
 
     //20*30
     private int level[] = {
@@ -171,14 +183,23 @@ public class GameView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
 
+        ArrayList<Task> list = new ArrayList<>();
+
         int count = 0;
             for (int i = 0; i < 25; i++) {
                 for (int j = 0; j < 25; j++) {
+                    Object object = new Object();
+                    object.height = height;
+                    object.width = width;
+                    object.i = i;
+                    object.j = j;
+                    object.canvas = canvas;
+
                     if (level[i * 25 + j] == 4) {
                         pacx = i;
                         pacy = j;
-                        canvas.drawBitmap(pacman, null,
-                                new Rect(j * width, i * height, (j + 1) * width, (i + 1) * height), null);
+
+                        object.bitmap = pacman;
                     }
                     if (level[i * 25 + j] == 2) {
                         Ghost g = new Ghost();
@@ -186,23 +207,25 @@ public class GameView extends View {
                         g.y = j;
                         ghosts[count] = g;
                         count++;
-                        canvas.drawBitmap(ghost, null,
-                                new Rect(j * width, i * height, (j + 1) * width, (i + 1) * height), null);
+
                     }
                     if (level[i * 25 + j] == 1) {
-                        canvas.drawBitmap(wall, null,
-                                new Rect(j * width, i * height, (j + 1) * width, (i + 1) * height), null);
+                        object.bitmap = wall;
                     }
                     if (level[i * 25 + j] == 0) {
                         exist = true;
-                        canvas.drawBitmap(point, null,
-                                new Rect(j * width, i * height, (j + 1) * width, (i + 1) * height), null);
+                        object.bitmap = point;
                     }
 
-
-
+                    if(object.bitmap != null)
+                    {
+                        Task task = new Task();
+                        task.execute(object);
+                        list.add(task);
+                    }
                 }
             }
+
             MediaPlayer mp = MediaPlayer.create(getContext(), R.raw.pacman_chomp);
 
 
@@ -289,8 +312,6 @@ public class GameView extends View {
                         speedx = -1;
                         speedy = 0;
                     }
-
-
                 }
             }
         }
