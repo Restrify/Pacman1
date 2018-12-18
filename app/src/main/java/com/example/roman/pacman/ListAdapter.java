@@ -9,9 +9,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-
-
-
 public class ListAdapter extends BaseAdapter {
     ArrayList<String> arrayList = new ArrayList<>();
     Context context;

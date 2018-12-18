@@ -17,7 +17,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".Settings" />
-        <activity android:name=".Highscore"></activity>
+        <activity android:name=".Highscore" />
+        <activity android:name=".Image"></activity>
     </application>
 
 </manifest>
