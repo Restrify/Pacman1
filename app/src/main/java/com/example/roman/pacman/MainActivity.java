@@ -91,8 +91,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         intent.putExtra("picture", 2);
                     }
                     startActivity(intent);
-
-
                 }
             };
         }, 0, TIMER_INTERVAL);

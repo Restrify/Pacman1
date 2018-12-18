@@ -44,6 +44,7 @@ class Ghost
 {
     int x;
     int y;
+    int moving;
 }
 
 public class GameView extends View {
@@ -268,52 +269,24 @@ public class GameView extends View {
 
         ArrayList<Task> list = new ArrayList<>();
 
-        /*if(victory)
-        {
-            DisplayMetrics displayMetrics = new DisplayMetrics();
-            ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-            int width2 = displayMetrics.widthPixels;
-            int height2 = displayMetrics.heightPixels;
+        int count = 0;
+        for (int i = 0; i < 25; i++) {
+            for (int j = 0; j < 25; j++) {
 
-            canvas.drawBitmap(victoryscreen,null,
-                    new Rect( width2, height2, width2, height2), null);
-        }
-        else if(loss)
-        {
-            DisplayMetrics displayMetrics = new DisplayMetrics();
-            ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-            int width2 = displayMetrics.widthPixels;
-            int height2 = displayMetrics.heightPixels;
-
-            canvas.drawBitmap(lossscreen,null,
-                    new Rect( width2, height2, width2, height2), null);
-
-        }*/
-            int count = 0;
-            for (int i = 0; i < 25; i++) {
-                for (int j = 0; j < 25; j++) {
-
-                    //stěny
-                    if (level[i * 25 + j] == 1) {
-                        canvas.drawBitmap(wall, null,
-                                new Rect(j * width, i * height, (j + 1) * width, (i + 1) * height), null);
-                    }
-                    //body
-                    else if (level[i * 25 + j] == 0) {
-                        if(!strawberryexists && whiteghosttimer==0)
+                //stěny
+                if (level[i * 25 + j] == 1) {
+                    canvas.drawBitmap(wall, null,
+                            new Rect(j * width, i * height, (j + 1) * width, (i + 1) * height), null);
+                }
+                //body
+                else if (level[i * 25 + j] == 0) {
+                    if(!strawberryexists && whiteghosttimer==0)
+                    {
+                        Random rnd = new Random();
+                        int random = rnd.nextInt(100);
+                        if(random < 3)
                         {
-                            Random rnd = new Random();
-                            int random = rnd.nextInt(100);
-                            if(random < 3)
-                            {
-                                level[i * 25 + j] = 5;
-                            }
-                            else
-                            {
-                                exist = true;
-                                canvas.drawBitmap(point, null,
-                                        new Rect(j * width, i * height, (j + 1) * width, (i + 1) * height), null);
-                            }
+                            level[i * 25 + j] = 5;
                         }
                         else
                         {
@@ -322,124 +295,135 @@ public class GameView extends View {
                                     new Rect(j * width, i * height, (j + 1) * width, (i + 1) * height), null);
                         }
                     }
-                    //vyžrané místo
-                    else if (level[i * 25 + j] == 3) {
-                        if(!strawberryexists && whiteghosttimer==0)
-                        {
-                            Random rnd = new Random();
-                            int random = rnd.nextInt(100);
-                            if(random < 3)
-                            {
-                                level[i * 25 + j] = 5;
-                            }
-                        }
-                    }
-                    //duchové
-                    else if (level[i * 25 + j] == 2) {
-                        Ghost g = new Ghost();
-                        g.x = i;
-                        g.y = j;
-                        ghosts[count] = g;
-                        count++;
-                        if(whiteghosts)
-                        {
-                            canvas.drawBitmap(whiteghost, null,
-                                    new Rect(j * width, i * height, (j + 1) * width, (i + 1) * height), null);
-                        }
-                        else
-                        {
-                            canvas.drawBitmap(ghost, null,
-                                    new Rect(j * width, i * height, (j + 1) * width, (i + 1) * height), null);
-                        }
-                    }
-                    //pacman
-                    else if (level[i * 25 + j] == 4) {
-                        pacx = i;
-                        pacy = j;
-                        canvas.drawBitmap(pacman, null,
-                                new Rect(j * width, i * height, (j + 1) * width, (i + 1) * height), null);
-                    }
-                    //jahoda
-                    if (level[i * 25 + j] == 5) {
+                    else
+                    {
                         exist = true;
-                        strawberryexists = true;
-                        canvas.drawBitmap(strawberry, null,
+                        canvas.drawBitmap(point, null,
                                 new Rect(j * width, i * height, (j + 1) * width, (i + 1) * height), null);
                     }
                 }
-            }
-
-            Task task = new Task();
-            Object obj = new Object();
-            obj.context = getContext();
-
-            //kontrola pohybu pacmana
-
-            if (level[(pacx + speedx) * 25 + (pacy + speedy)] == 0) {
-                obj.sound = R.raw.pacman_chomp;
-                task.execute(obj);
-                points += 10;
-                level[pacx * 25 + pacy] = 3;
-                level[(pacx + speedx) * 25 + (pacy + speedy)] = 4;
-            }
-            else if (level[(pacx + speedx) * 25 + (pacy + speedy)] == 3) {
-                level[pacx * 25 + pacy] = 3;
-                level[(pacx + speedx) * 25 + (pacy + speedy)] = 4;
-            }
-            else if (level[(pacx + speedx) * 25 + (pacy + speedy)] == 1) {
-                speedx = 0;
-                speedy = 0;
-            }
-            else if (level[(pacx + speedx) * 25 + (pacy + speedy)] == 2) {
-                if(whiteghosts)
-                {
-                    level[(pacx + speedx) * 25 + (pacy + speedy)] = 4;
-                    level[pacx * 25 + pacy] = 2;
-                    points +=100;
-
+                //vyžrané místo
+                else if (level[i * 25 + j] == 3) {
+                    if(!strawberryexists && whiteghosttimer==0)
+                    {
+                        Random rnd = new Random();
+                        int random = rnd.nextInt(100);
+                        if(random < 3)
+                        {
+                            level[i * 25 + j] = 5;
+                        }
+                    }
                 }
+                //duchové
+                else if (level[i * 25 + j] == 2) {
+                    Ghost g = new Ghost();
+                    g.x = i;
+                    g.y = j;
+                    ghosts[count] = g;
+                    count++;
+                    if(whiteghosts)
+                    {
+                        canvas.drawBitmap(whiteghost, null,
+                                new Rect(j * width, i * height, (j + 1) * width, (i + 1) * height), null);
+                    }
+                    else
+                    {
+                        canvas.drawBitmap(ghost, null,
+                                new Rect(j * width, i * height, (j + 1) * width, (i + 1) * height), null);
+                    }
+                }
+                //pacman
+                else if (level[i * 25 + j] == 4) {
+                    pacx = i;
+                    pacy = j;
+                    canvas.drawBitmap(pacman, null,
+                            new Rect(j * width, i * height, (j + 1) * width, (i + 1) * height), null);
+                }
+                //jahoda
+                if (level[i * 25 + j] == 5) {
+                    exist = true;
+                    strawberryexists = true;
+                    canvas.drawBitmap(strawberry, null,
+                            new Rect(j * width, i * height, (j + 1) * width, (i + 1) * height), null);
+                }
+            }
+        }
+
+        Task task = new Task();
+        Object obj = new Object();
+        obj.context = getContext();
+
+        //kontrola pohybu pacmana
+
+        if (level[(pacx + speedx) * 25 + (pacy + speedy)] == 0) {
+            obj.sound = R.raw.pacman_chomp;
+            task.execute(obj);
+            points += 10;
+            level[pacx * 25 + pacy] = 3;
+            level[(pacx + speedx) * 25 + (pacy + speedy)] = 4;
+        }
+        else if (level[(pacx + speedx) * 25 + (pacy + speedy)] == 3) {
+            level[pacx * 25 + pacy] = 3;
+            level[(pacx + speedx) * 25 + (pacy + speedy)] = 4;
+        }
+        else if (level[(pacx + speedx) * 25 + (pacy + speedy)] == 1) {
+            speedx = 0;
+            speedy = 0;
+        }
+        else if (level[(pacx + speedx) * 25 + (pacy + speedy)] == 2) {
+            if(whiteghosts)
+            {
+                level[(pacx + speedx) * 25 + (pacy + speedy)] = 4;
+                level[pacx * 25 + pacy] = 2;
+                points +=100;
+
+            }
+            else
+            {
                 loss = true;
             }
-            else if (level[(pacx + speedx) * 25 + (pacy + speedy)] == 5) {
-                whiteghosttimer = 50;
-                whiteghosts = true;
-                strawberryexists = false;
-                points +=50;
-                level[pacx * 25 + pacy] = 3;
-                level[(pacx + speedx) * 25 + (pacy + speedy)] = 4;
-            }
+
+        }
+        else if (level[(pacx + speedx) * 25 + (pacy + speedy)] == 5) {
+            whiteghosttimer = 50;
+            whiteghosts = true;
+            strawberryexists = false;
+            points +=50;
+            level[pacx * 25 + pacy] = 3;
+            level[(pacx + speedx) * 25 + (pacy + speedy)] = 4;
+        }
 
 
-            ghostnum++;
+        ghostnum++;
 
-            if (ghostnum == 3) {
-                moveGhosts();
-                ghostnum = 0;
-            }
-            //pokud uplynul určitý čas, tak jsou duchové zase smrtícími zabijáky
-            if(whiteghosttimer!=0)
-            {
-                whiteghosttimer--;
-            }
-            if(whiteghosttimer == 0)
-            {
-                whiteghosts = false;
-            }
+        if (ghostnum == 3) {
+            moveGhosts();
+            ghostnum = 0;
+        }
+        //pokud uplynul určitý čas, tak jsou duchové zase smrtícími zabijáky
+        if(whiteghosttimer!=0)
+        {
+            whiteghosttimer--;
+        }
+        if(whiteghosttimer == 0)
+        {
+            whiteghosts = false;
+        }
 
-            pacx += speedx;
-            pacy += speedy;
+        pacx += speedx;
+        pacy += speedy;
 
-            canvas.drawText("Skóre: " + points, 20, 60, score);
+        canvas.drawText("Skóre: " + points, 20, 60, score);
 
-            canvas.drawText("Obtížnost: 0", canvas.getWidth() / 2, 60, diff);
+        canvas.drawText("Obtížnost: 0", canvas.getWidth() / 2, 60, diff);
 
-            canvas.drawBitmap(life[0], 10, canvas.getHeight() - 80, null);
-            canvas.drawBitmap(life[1], 110, canvas.getHeight() - 80, null);
-            //canvas.drawBitmap(life[2], 210, canvas.getHeight() - 80, null);
+        canvas.drawBitmap(life[0], 10, canvas.getHeight() - 80, null);
+        canvas.drawBitmap(life[1], 110, canvas.getHeight() - 80, null);
+        //canvas.drawBitmap(life[2], 210, canvas.getHeight() - 80, null);
 
-            if (!exist) {
-                victory = true;
-            }
+        if (!exist) {
+            victory = true;
+        }
     }
     public boolean onTouchEvent(MotionEvent event) {
 
@@ -493,65 +477,239 @@ public class GameView extends View {
         return super.onTouchEvent(event);
     }
 
-    public void GenerateStrawberry()
+    public void decideDir(Ghost g)
     {
+        List<Point> points = new ArrayList<Point>();
+        int moving = 0;
+        if (level[(g.x + 1) * 25 + g.y] != 1 && level[(g.x + 1) * 25 + g.y] != 2 && level[(g.x + 1) * 25 + g.y] != 5) {
+            Point point = new Point();
+            point.x = g.x + 1;
+            point.y = g.y;
+            point.point = level[(g.x + 1) * 25 + g.y];
+
+            moving = 3;
+
+            points.add(point);
+
+        }
+        if (level[(g.x - 1) * 25 + g.y] != 1 && level[(g.x - 1) * 25 + g.y] != 2 && level[(g.x - 1) * 25 + g.y] != 5) {
+            Point point = new Point();
+            point.x = g.x - 1;
+            point.y = g.y;
+            point.point = level[(g.x - 1) * 25 + g.y];
+
+            moving = 4;
+
+            points.add(point);
+
+        }
+        if (level[g.x * 25 + g.y + 1] != 1 && level[g.x * 25 + g.y + 1] != 2 && level[g.x * 25 + g.y + 1] != 5) {
+            Point point = new Point();
+            point.x = g.x;
+            point.y = g.y + 1;
+            point.point = level[g.x * 25 + g.y + 1];
+
+            moving = 1;
+
+            points.add(point);
+
+        }
+        if (level[g.x * 25 + g.y - 1] != 1 && level[g.x * 25 + g.y - 1] != 2 && level[g.x * 25 + g.y - 1] != 5) {
+            Point point = new Point();
+            point.x = g.x;
+            point.y = g.y - 1;
+            point.point = level[g.x * 25 + g.y - 1];
+
+            moving = 2;
+
+            points.add(point);
+
+        }
+        if (points.size() != 0) {
+            Random rnd = new Random();
+            int rand = rnd.nextInt(points.size());
 
 
+            g.moving = moving;
+            if(whiteghosts)
+            {
+                if(level[points.get(rand).x * 25 + points.get(rand).y] == 4)
+                {
+
+                }
+                else
+                {
+                    level[points.get(rand).x * 25 + points.get(rand).y] = 2;
+                    level[g.x * 25 + g.y] = points.get(rand).point;
+                }
+
+            }
+            else
+            {
+                if(level[points.get(rand).x * 25 + points.get(rand).y] == 4)
+                {
+
+                }
+                else
+                {
+                    level[points.get(rand).x * 25 + points.get(rand).y] = 2;
+                    level[g.x * 25 + g.y] = points.get(rand).point;
+                }
+            }
+
+        }
     }
 
     public void moveGhosts()
     {
         List<Point> points = new ArrayList<Point>();
+        int moving = 0;
         for(int i=0;i<ghosts.length;i++)
         {
-            if(level[(ghosts[i].x+1)*25 + ghosts[i].y] != 1 && level[(ghosts[i].x+1)*25 + ghosts[i].y] != 2)
-            {
-                Point point = new Point();
-                point.x = ghosts[i].x+1;
-                point.y = ghosts[i].y;
-                point.point = level[(ghosts[i].x+1)*25 + ghosts[i].y];
+            if(ghosts[i].moving == 0) {
+                if (level[(ghosts[i].x + 1) * 25 + ghosts[i].y] != 1 && level[(ghosts[i].x + 1) * 25 + ghosts[i].y] != 2 && level[(ghosts[i].x + 1) * 25 + ghosts[i].y] != 5) {
+                    Point point = new Point();
+                    point.x = ghosts[i].x + 1;
+                    point.y = ghosts[i].y;
+                    point.point = level[(ghosts[i].x + 1) * 25 + ghosts[i].y];
 
-                points.add(point);
+                    moving = 3;
 
+                    points.add(point);
+
+                }
+                if (level[(ghosts[i].x - 1) * 25 + ghosts[i].y] != 1 && level[(ghosts[i].x - 1) * 25 + ghosts[i].y] != 2 && level[(ghosts[i].x - 1) * 25 + ghosts[i].y] != 5) {
+                    Point point = new Point();
+                    point.x = ghosts[i].x - 1;
+                    point.y = ghosts[i].y;
+                    point.point = level[(ghosts[i].x - 1) * 25 + ghosts[i].y];
+
+                    moving = 4;
+
+                    points.add(point);
+
+                }
+                if (level[ghosts[i].x * 25 + ghosts[i].y + 1] != 1 && level[ghosts[i].x * 25 + ghosts[i].y + 1] != 2 && level[ghosts[i].x * 25 + ghosts[i].y + 1] != 5) {
+                    Point point = new Point();
+                    point.x = ghosts[i].x;
+                    point.y = ghosts[i].y + 1;
+                    point.point = level[ghosts[i].x * 25 + ghosts[i].y + 1];
+
+                    moving = 1;
+
+                    points.add(point);
+
+                }
+                if (level[ghosts[i].x * 25 + ghosts[i].y - 1] != 1 && level[ghosts[i].x * 25 + ghosts[i].y - 1] != 2 && level[ghosts[i].x * 25 + ghosts[i].y - 1] != 5) {
+                    Point point = new Point();
+                    point.x = ghosts[i].x;
+                    point.y = ghosts[i].y - 1;
+                    point.point = level[ghosts[i].x * 25 + ghosts[i].y - 1];
+
+                    moving = 2;
+
+                    points.add(point);
+
+                }
+                if (points.size() != 0) {
+                    Random rnd = new Random();
+                    int rand = rnd.nextInt(points.size());
+
+
+                    ghosts[i].moving = moving;
+                    if(whiteghosts)
+                    {
+                        if(level[points.get(rand).x * 25 + points.get(rand).y] == 4)
+                        {
+
+                        }
+                        else
+                        {
+                            level[points.get(rand).x * 25 + points.get(rand).y] = 2;
+                            level[ghosts[i].x * 25 + ghosts[i].y] = points.get(rand).point;
+                        }
+
+                    }
+                    else
+                    {
+                        if(level[points.get(rand).x * 25 + points.get(rand).y] == 4)
+                        {
+
+                        }
+                        else
+                        {
+                            level[points.get(rand).x * 25 + points.get(rand).y] = 2;
+                            level[ghosts[i].x * 25 + ghosts[i].y] = points.get(rand).point;
+                        }
+                    }
+                }
+                else
+                {
+                    ghosts[i].moving = 0;
+                }
             }
-            if(level[(ghosts[i].x-1)*25 + ghosts[i].y] != 1 && level[(ghosts[i].x-1)*25 + ghosts[i].y] != 2)
+            else
             {
-                Point point = new Point();
-                point.x = ghosts[i].x-1;
-                point.y = ghosts[i].y;
-                point.point = level[(ghosts[i].x-1)*25 + ghosts[i].y];
+                if(ghosts[i].moving == 1)
+                {
+                    ghosts[i].moving = 0;
+                    if (level[ghosts[i].x * 25 + ghosts[i].y + 1] != 1 && level[ghosts[i].x * 25 + ghosts[i].y + 1] != 2)
+                    {
+                        ghosts[i].moving = moving;
+                        level[ghosts[i].x * 25 + ghosts[i].y] = level[ghosts[i].x * 25 + ghosts[i].y+1];
+                        level[ghosts[i].x * 25 + ghosts[i].y+1] = 2;
+                    }
+                    else
+                    {
+                        decideDir(ghosts[i]);
+                    }
 
-                points.add(point);
+                }
+                else if(ghosts[i].moving == 2)
+                {
+                    ghosts[i].moving = 0;
+                    if (level[ghosts[i].x * 25 + ghosts[i].y - 1] != 1 && level[ghosts[i].x * 25 + ghosts[i].y - 1] != 2)
+                    {
+                        ghosts[i].moving = moving;
+                        level[ghosts[i].x * 25 + ghosts[i].y] = level[ghosts[i].x * 25 + ghosts[i].y-1];
+                        level[ghosts[i].x * 25 + ghosts[i].y-1] = 2;
+                    }
+                    else
+                    {
+                        decideDir(ghosts[i]);
+                    }
 
-            }
-            if(level[ghosts[i].x*25 + ghosts[i].y+1] != 1 && level[ghosts[i].x*25 + ghosts[i].y+1] != 2)
-            {
-                Point point = new Point();
-                point.x = ghosts[i].x;
-                point.y = ghosts[i].y+1;
-                point.point = level[ghosts[i].x*25 + ghosts[i].y+1];
+                }
+                else if(ghosts[i].moving == 3)
+                {
+                    ghosts[i].moving = 0;
+                    if (level[(ghosts[i].x + 1) * 25 + ghosts[i].y] != 1 && level[(ghosts[i].x + 1) * 25 + ghosts[i].y] != 2)
+                    {
+                        ghosts[i].moving = moving;
+                        level[ghosts[i].x * 25 + ghosts[i].y] = level[(ghosts[i].x + 1) * 25 + ghosts[i].y];
+                        level[(ghosts[i].x + 1) * 25 + ghosts[i].y] = 2;
+                    }
+                    else
+                    {
+                        decideDir(ghosts[i]);
+                    }
 
-                points.add(point);
+                }
+                else if(ghosts[i].moving == 4)
+                {
+                    ghosts[i].moving = 0;
+                    if (level[(ghosts[i].x - 1) * 25 + ghosts[i].y] != 1 && level[(ghosts[i].x - 1) * 25 + ghosts[i].y] != 2)
+                    {
+                        ghosts[i].moving = moving;
+                        level[ghosts[i].x * 25 + ghosts[i].y] = level[(ghosts[i].x - 1) * 25 + ghosts[i].y];
+                        level[(ghosts[i].x - 1) * 25 + ghosts[i].y] = 2;
+                    }
+                    else
+                    {
+                        decideDir(ghosts[i]);
+                    }
 
-            }
-            if(level[ghosts[i].x*25 + ghosts[i].y-1] != 1 && level[ghosts[i].x*25 + ghosts[i].y-1] != 2)
-            {
-                Point point = new Point();
-                point.x = ghosts[i].x;
-                point.y = ghosts[i].y-1;
-                point.point = level[ghosts[i].x*25 + ghosts[i].y-1];
-
-                points.add(point);
-
-            }
-            if(points.size()!=0)
-            {
-                Random rnd = new Random();
-                int rand = rnd.nextInt(points.size());
-
-
-                level[points.get(rand).x*25 + points.get(rand).y] = 2;
-                level[ghosts[i].x*25 + ghosts[i].y] = points.get(rand).point;
+                }
             }
         }
 
